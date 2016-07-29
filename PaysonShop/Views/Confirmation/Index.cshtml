@@ -1,0 +1,94 @@
+﻿@model PaysonShop.Models.ConfirmationViewModel
+
+@{
+    Layout = null;
+    
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true; 
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Test</title>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/mvc/4.0/jquery.validate.unobtrusive.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.unobtrusive-ajax.js"></script>
+        
+        <link rel='stylesheet' id='main-css' href='~/Content/main.css?ver=1.0.0c' type='text/css' media='all' />
+         <style>
+            a {
+              border: 0;
+              background: none;
+              background-color: #60646c;
+              border-color: #60646c;
+              color: #fff;
+              cursor: pointer;
+              /* Improves usability and consistency of cursor style between image-type 'input' and others */
+              line-height: 1;
+              padding: .618em 1em;
+              text-decoration: none;
+              font-weight: 700;
+              text-shadow: none;
+              display: inline-block;
+              outline: none;
+              -webkit-appearance: none;
+              -webkit-font-smoothing: antialiased;
+              border-radius: 0;
+
+            }
+        </style>
+    </head>
+    <body style="margin: 0">
+         <div style="width: 100%; height: 70px; background-color: #28315c; color: #FFF; margin-top: 0; margin-bottom: 20px;">
+            
+                <div style="float:left"><img src="~/Content/pp.png" /> </div>
+                <div style="float:left"><h1 style="margin-top: 0; line-height: 40px; margin-top: 27px; margin-left: 20px;">Checkout page</h1></div>
+                <div style="float:right"><h1 style="margin-top: 0; line-height: 40px; margin-top: 27px; margin-left: 20px;">@Model.ShoppingCart.CheckoutId</h1></div>
+                <div style="clear: both"></div>
+            
+        </div>
+
+        <div style="width: 1000px; margin-left:auto; margin-right: auto;">
+             <div id="confirmationContainer" style="width: 600px; margin-left:auto; margin-right: auto; border: dotted gray 1px;">
+            
+                @Html.Raw(Model.ConfirmationSnippet)
+    
+                <div >
+                    <select id="sizeSelector" style="margin-top: 15px;">
+                        <option value="300">300px</option>
+                        <option value="400">400px</option>
+                        <option value="500">500px</option>
+                        <option value="600" selected>600px</option>
+                        <option value="700">700px</option>
+                        <option value="800">800px</option>
+                        <option value="900">900px</option>
+                        <option value="1000">1000px</option>
+                    </select>
+                </div>
+            </div>
+
+            <script>
+                function paysonUpdateHeight(event) {
+                    $('#confirmationContainer').animate({ height: event.data }, 'fast');
+                }
+
+                $(document).ready(function () {
+                    window.addEventListener("message", paysonUpdateHeight, false);
+
+                    $("#sizeSelector").change(function () {
+
+                        var value = $(this).val();
+
+                        $("#confirmationContainer").animate({ width: value }, 'fast');
+                    });
+                });
+            </script>
+
+            <div style="clear: both;"></div>
+        </div>
+    </body>
+</html>

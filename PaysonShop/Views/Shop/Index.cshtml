@@ -1,0 +1,394 @@
+﻿@model PaysonShop.Models.ShopViewModel
+
+@{
+    HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Demoshop</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/mvc/4.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.unobtrusive-ajax.js"></script>
+
+    <link rel='stylesheet' id='main-css' href='~/Content/main.css?ver=1.0.0c' type='text/css' media='all' />
+
+</head>
+<body style="margin: 0; padding: 0">
+
+    <div style="width: 100%; height: 70px; background-color: #28315c; color: #FFF; margin-top: 0; margin-bottom: 20px;">
+        <div style="width: 1000px; margin-left: auto; margin-right: auto;">
+            <div style="float:left"><img src="~/Content/pp.png" /> </div>
+            <div style="float:left"><h1 style="margin-top: 0; line-height: 40px; margin-top: 27px; margin-left: 20px;">Shop page</h1></div>
+            <div style="clear: both"></div>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("GoToCheckout", "Shop", FormMethod.Post))
+    {
+        @Html.HiddenFor(x => x.ShoppingCart.Id)
+
+        <div style="width: 1000px; margin-left: auto; margin-right: auto;">
+            <div style="width: 100%;">
+                <article>
+                    <header>
+                        <h1>Order items</h1>
+                    </header>
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="required" style="text-align: left;">Name</th>
+                                <th class="required" style="text-align: left;">UnitPrice</th>
+                                <th class="required" style="text-align: left;">Quantity</th>
+                                <th style="text-align: left;">Type</th>
+                                <th style="text-align: left;">TaxRate</th>
+                                <th style="text-align: left;">DiscountRate</th>
+                                <th style="text-align: left;">Uri</th>
+                                <th style="text-align: left;">ImageUri</th>
+                                <th style="text-align: left;">Reference</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (var i = 0; i < Model.Order.Items.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].Name, new { style = "width: 150px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].UnitPrice, new { style = "width: 80px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].Quantity, new { style = "width: 80px;", type = "number", step = "1", min = "0" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.DropDownListFor(x => Model.Order.Items[i].Type, Model.GetItemTypeOptions(Model.Order.Items[i].Type), new { style = "width: 80px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].TaxRate, "{0:0.00}", new { style = "width: 80px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].DiscountRate, "{0:0.00}", new { style = "width: 100px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].Uri, new { style = "width: 100px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].ImageUri, new { style = "width: 100px;" })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            @Html.TextBoxFor(x => Model.Order.Items[i].Reference, new { style = "width: 100px;" })
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </article>
+            </div>
+
+            <div id="advancedMode" style="display: none">
+
+                <div style="float: left; width: 480px; margin-right: 40px;">
+                    <article>
+                        <header>
+                            <h1>Authorization</h1>
+                        </header>
+                        <table>
+                            <tr>
+                                <td width="150">
+                                    <label class="required">MerchantId:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.MerchantId)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="required">ApiKey:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.ApiKey)</span>
+                                    <BR /><BR />
+                                    <button type="button" onClick="ValidAgentCredentials()">Verify credentials</button>
+                                    <div id="validationCredentials" style="border: 1px solid silver; padding: 20px; display: none; margin-top: 20px;"></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </article>
+
+                    <article>
+                        <header>
+                            <h1>Merchant</h1>
+                        </header>
+                        <table>
+                            <tr>
+                                <td width="150">
+                                    <label class="required">CheckoutUri:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.CheckoutUri)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="required">ConfirmationUri:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.ConfirmationUri)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="required">NotificationUri:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.NotificationUri)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="required">TermsUri:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.TermsUri)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>ValidationUri:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.ValidationUri)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Reference:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Merchant.Reference)</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </article>
+
+                </div>
+
+                <div style="float: left; width: 480px;">
+                    <article>
+                        <header>
+                            <h1>Customer</h1>
+                        </header>
+                        <table>
+                            <tr>
+                                <td>
+                                    <label>IdentityNumber:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.IdentityNumber)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="150">
+                                    <label>FirstName:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.FirstName)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>LastName:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.LastName)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Email:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.Email)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>CountryCode:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.CountryCode)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>City:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.City)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>PostalCode:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.PostalCode)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Street:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.Street)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Phone:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.Phone)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Reference:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.TextBoxFor(x => x.Customer.Reference)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Type:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.DropDownListFor(x => x.Customer.Type, Model.CustomerTypeOptions)</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </article>
+
+                </div>
+
+                <div style="clear: both"></div>
+
+                <div style="float: left; width: 480px; margin-right: 40px;">
+                    <article>
+                        <header>
+                            <h1>Order</h1>
+                        </header>
+                        <table>
+                            <tr>
+                                <td width="150">
+                                    <label class="required">Currency:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.DropDownListFor(x => x.Order.Currency, Model.CurrencyOptions)</span>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </article>
+                </div>
+
+                <div style="float: left; width: 480px;">
+                    <article>
+                        <header>
+                            <h1>Gui</h1>
+                        </header>
+                        <table>
+                            <tr>
+                                <td width="150">
+                                    <label>ColorScheme:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.DropDownListFor(x => x.Gui.ColorScheme, Model.ColorSchemeOptions)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Locale:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.DropDownListFor(x => x.Gui.Locale, Model.LocaleOptions)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>RequestPhone:</label>
+                                </td>
+                                <td>
+                                    <span>@Html.CheckBoxFor(x => x.Gui.RequestPhone)</span>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </article>
+                </div>
+            </div>
+
+            <div style="clear: both"></div>
+
+            <div style="text-align: center; width: 100%;">
+                <br />
+                <a href="javascript:ShowAdvanced()" id="advancedModeLink">Show advanced mode</a>
+            </div>
+
+        <div style="text-align: center; width: 100%; margin-bottom: 20px;">
+                <br />
+                <button id="submitButton" type="submit">Go to checkout</button>
+            </div>
+        </div>
+    }
+
+<script>
+    function ShowAdvanced() {
+        if ($('#advancedMode').is(":hidden")) {
+            $('#advancedMode').slideDown();
+            $('#advancedModeLink').text("Hide advanced mode");
+        } else {
+            $('#advancedMode').slideUp();
+            $('#advancedModeLink').text("Show advanced mode");
+        }
+        
+        
+    }
+    function ValidAgentCredentials() {
+        $('#validationCredentials').show().html('<pre>Loading...</pre>');
+        $.post('Shop/Verify', { MerchantId: $('#MerchantId').val(), ApiKey: $('#ApiKey').val() }, function (data) {
+            var html = ''; for (var i in data) { html += '<div style="line-height:30px;"><b>' + i + '</b>: ' + data[i] + "</div>"; }
+            $('#validationCredentials').html('<div>' + html + '</div>');
+        });
+    }
+</script>
+</body>
+</html>
+
