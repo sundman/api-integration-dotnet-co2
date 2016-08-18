@@ -37,6 +37,10 @@ namespace PaysonIntegration
             ApiUrl = $"http://{(inTestMode ? "test-" : "")}api.payson.se/2.0/";
         }
 
+
+        /// <summary>
+        /// Ignore this function! Used to set up API url for local debugging
+        /// </summary>
         public void SetApiUrl(string apiUrl)
         {
             if (!string.IsNullOrEmpty(apiUrl))

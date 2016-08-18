@@ -15,5 +15,7 @@ namespace PaysonIntegration.Models
         public Uri TermsUri { get; set; }
 
         public string Reference { get; set; }
+
+        public string PartnerId{ get; set; }
     }
 }
