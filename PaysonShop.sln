@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaysonIntegration", "PaysonIntegration\PaysonIntegration.csproj", "{17CEE633-C6C8-48F6-B8E3-39471587A617}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaysonIntegrationCO2", "PaysonIntegrationCO2\PaysonIntegrationCO2.csproj", "{17CEE633-C6C8-48F6-B8E3-39471587A617}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaysonShop", "PaysonShop\PaysonShop.csproj", "{3E865487-2FC3-4D4F-8D26-A89057A11FFF}"
 EndProject
