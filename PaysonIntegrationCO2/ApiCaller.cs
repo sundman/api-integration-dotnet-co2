@@ -58,17 +58,16 @@ namespace PaysonIntegrationCO2
         public string NewCheckout(Checkout checkout)
         {
             var requestBody = JsonConvert.SerializeObject(checkout);
-
-            var response = ApiRequest("Post", CheckoutsUrl, requestBody);
-
-            if (response.StatusCode != HttpStatusCode.Created)
+            using (var response = ApiRequest("Post", CheckoutsUrl, requestBody))
             {
-                throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
+                if (response.StatusCode != HttpStatusCode.Created)
+                {
+                    throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
+                }
+
+                var checkoutLocation = response.Headers["Location"];
+                return checkoutLocation;
             }
-
-            var checkoutLocation = response.Headers["Location"];
-
-            return checkoutLocation;
         }
 
         /// <summary>
@@ -81,32 +80,31 @@ namespace PaysonIntegrationCO2
         public CheckoutList GetCheckoutList(int page = 1, CheckoutStatus? status = null)
         {
             var url = $"{CheckoutsUrl}?page={page}&status={status}";
-
-            var response = ApiRequest("Get", url, string.Empty);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            using (var response = ApiRequest("Get", url, string.Empty))
             {
-                throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
-            }
-
-            string responseBody;
-
-            using (var responseStream = response.GetResponseStream())
-            {
-                if (responseStream == null)
+                if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new NullReferenceException("No response stream found.");
+                    throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
                 }
 
-                using (var reader = new StreamReader(responseStream))
+                string responseBody;
+
+                using (var responseStream = response.GetResponseStream())
                 {
-                    responseBody = reader.ReadToEnd();
+                    if (responseStream == null)
+                    {
+                        throw new NullReferenceException("No response stream found.");
+                    }
+
+                    using (var reader = new StreamReader(responseStream))
+                    {
+                        responseBody = reader.ReadToEnd();
+                    }
                 }
+
+                var checkoutList = JsonConvert.DeserializeObject<CheckoutList>(responseBody);
+                return checkoutList;
             }
-
-            var checkoutList = JsonConvert.DeserializeObject<CheckoutList>(responseBody);
-
-            return checkoutList;
         }
 
         /// <summary>
@@ -118,7 +116,6 @@ namespace PaysonIntegrationCO2
         public Checkout GetCheckout(Guid id)
         {
             var checkoutUrl = CheckoutsUrl + "/" + id;
-
             return GetCheckout(checkoutUrl);
         }
 
@@ -129,30 +126,32 @@ namespace PaysonIntegrationCO2
         /// <exception cref="WebException">Thrown if the web request fails or if the answer is unexpected.</exception>
         public Account Validate()
         {
-            var response = ApiRequest("Get", AccountUrl + "/", string.Empty);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            using (var response = ApiRequest("Get", AccountUrl + "/", string.Empty))
             {
-                throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
-            }
-
-            string responseBody;
-
-            using (var responseStream = response.GetResponseStream())
-            {
-                if (responseStream == null)
+                if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new NullReferenceException("No response stream found.");
+                    throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
                 }
 
-                using (var reader = new StreamReader(responseStream))
-                {
-                    responseBody = reader.ReadToEnd();
-                }
-            }
+                string responseBody;
 
-            var agent = JsonConvert.DeserializeObject<Account>(responseBody);
-            return agent;
+                using (var responseStream = response.GetResponseStream())
+                {
+                    if (responseStream == null)
+                    {
+                        throw new NullReferenceException("No response stream found.");
+                    }
+
+                    using (var reader = new StreamReader(responseStream))
+                    {
+                        responseBody = reader.ReadToEnd();
+                    }
+                }
+
+                var agent = JsonConvert.DeserializeObject<Account>(responseBody);
+                return agent;
+            }
+          
         }
 
         /// <summary>
@@ -163,31 +162,33 @@ namespace PaysonIntegrationCO2
         /// <exception cref="WebException">Thrown if the web request fails or if the answer is unexpected.</exception>
         public Checkout GetCheckout(string url)
         {
-            var response = ApiRequest("Get", url, string.Empty);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            using (var response = ApiRequest("Get", url, string.Empty))
             {
-                throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
-            }
-
-            string responseBody;
-
-            using (var responseStream = response.GetResponseStream())
-            {
-                if (responseStream == null)
+                if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new NullReferenceException("No response stream found.");
+                    throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
                 }
 
-                using (var reader = new StreamReader(responseStream))
+                string responseBody;
+
+                using (var responseStream = response.GetResponseStream())
                 {
-                    responseBody = reader.ReadToEnd();
+                    if (responseStream == null)
+                    {
+                        throw new NullReferenceException("No response stream found.");
+                    }
+
+                    using (var reader = new StreamReader(responseStream))
+                    {
+                        responseBody = reader.ReadToEnd();
+                    }
                 }
+
+                var checkout = JsonConvert.DeserializeObject<Checkout>(responseBody);
+
+                return checkout;
             }
 
-            var checkout = JsonConvert.DeserializeObject<Checkout>(responseBody);
-
-            return checkout;
         }
 
         /// <summary>
@@ -198,14 +199,14 @@ namespace PaysonIntegrationCO2
         public void SaveCheckout(Checkout checkout)
         {
             var requestBody = JsonConvert.SerializeObject(checkout);
-
             var checkoutUrl = CheckoutsUrl + "/" + checkout.Id;
 
-            var response = ApiRequest("Put", checkoutUrl, requestBody);
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            using (var response = ApiRequest("Put", checkoutUrl, requestBody))
             {
-                throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new WebException("Unexpected status code.", null, WebExceptionStatus.Success, response);
+                }
             }
         }
 
