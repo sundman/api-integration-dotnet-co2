@@ -27,7 +27,7 @@ namespace PaysonIntegrationCO2.Models
 
         public decimal TotalTaxAmount { get; set; }
 
-        public decimal TotalCreditedAmount { get; set; }
+        public decimal CreditedAmount { get; set; }
 
         public ItemType Type { get; set; }
 
